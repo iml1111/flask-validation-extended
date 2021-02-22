@@ -1,8 +1,9 @@
 from .types import All, List, Dict, type_check
+from .rules import ValidationRule
 from .exceptions import (
     InvalidOptional, InvalidDefault,
-    InvalidAnnotation, InvalidRules,
-    InvalidAnnotationJson
+    InvalidAnnotation, InvalidRule,
+    InvalidAnnotationJson , InvalidRuleAnnotation
 )
 
 
@@ -28,6 +29,10 @@ class Parameter:
     def _annotation_valid(self, annotation):
         if annotation in SINGLE_TYPES or annotation is All:
             return annotation
+        elif isinstance(annotation, (tuple, list)):
+            for ann_i in annotation:
+                self._annotation_valid(ann_i)
+            return annotation
         raise InvalidAnnotation(self.__class__.__name__)
 
     @staticmethod
@@ -36,9 +41,21 @@ class Parameter:
             return default
         raise InvalidDefault()
 
-    @staticmethod
-    def _rules_valid(rules):
-        rules = rules if rules else []
+    def _rules_valid(self, rules):
+
+        rules = [] if rules is None else rules
+        if not isinstance(rules, (tuple, list)):
+            rules = [rules]
+
+        origin_ann = self.annotation
+        if hasattr(self.annotation, 'org_type'):
+            origin_ann = self.annotation.org_type
+
+        for rule in rules:
+            if rule.__class__.__bases__[0] is not ValidationRule:
+                raise InvalidRule(rule.__class__.__bases__[0])
+            if rule.types is not All and origin_ann not in rule.types:
+               raise InvalidRuleAnnotation(rule.__class__.__name__, rule.types, origin_ann)
         return rules
 
     @staticmethod
@@ -52,6 +69,14 @@ class Route(Parameter):
     pass
 
 
+class Query(Parameter):
+    pass
+
+
+class Form(Parameter):
+    pass
+
+
 class Header(Parameter):
     def __init__(self, headername_or_annotation=All, *args, **kwargs):
         if isinstance(headername_or_annotation, str):
@@ -62,20 +87,18 @@ class Header(Parameter):
             super().__init__(headername_or_annotation, *args, **kwargs)
 
 
-class Query(Parameter):
-    pass
-
-
-class Form(Parameter):
-    pass
-
-
 class Json(Parameter):
 
     def _annotation_valid(self, annotation):
-        if annotation in BUILTIN_TYPES or \
-                type(annotation) in CUSTOM_TYPES or \
-                annotation is All:
+        if (
+            annotation in BUILTIN_TYPES or
+            type(annotation) in CUSTOM_TYPES or
+            annotation is All
+        ):
+            return annotation
+        elif isinstance(annotation, (tuple, list)):
+            for ann_i in annotation:
+                self._annotation_valid(ann_i)
             return annotation
         raise InvalidAnnotationJson(self.__class__.__name__)
 

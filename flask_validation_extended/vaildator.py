@@ -97,16 +97,20 @@ class Validator:
                         f"'{param_name}' can't be converted to {param_annotation}."
                     )
 
-            # optional이 아니며, type check에 실패한 경우
-            if is_required and not type_check(user_input, param_annotation):
+            # 사용자 입력값이 None이 아니며, type check에 실패한 경우
+            if user_input is not None and not type_check(user_input, param_annotation):
                 return self.error_func(
                     f"In '{param_object_name}' Params, "
                     f"'{param_name}' is not {param_annotation}."
                 )
 
-            # 입력 Rule에 대하여 validation 개시
-            if valid_rules:
-                pass
+            # 사용자 입력값이 None이 아니면, 입력된 Rule에 대하여 validation 개시
+            if user_input is not None:
+                for rule in valid_rules:
+                    if not rule.is_valid(user_input):
+                        return self.error_func(
+                            f'Parameter <{param_name}>: {rule.invalid_str()}'
+                        )
 
             parsed_inputs[param_name] = user_input
 

@@ -4,6 +4,9 @@ Types
     - Builtin Types: int, str, float, bool, list, dict
     - Custom Types: List, Dict, All
 """
+from .exceptions import InvalidAnnotationJson
+
+
 class All:
     pass
 
@@ -12,13 +15,20 @@ class List:
 
     def __init__(self, item=All):
         self.item = item
-        self.__origin__ = list
+        self._org_type = list
         self.__name__ = self.__str__()
 
     def __str__(self):
-        if isinstance(self.item, tuple):
-            return f"List({[i.__name__ for i in self.item]})"
-        return f"List({self.item.__name__})"
+        try:
+            if isinstance(self.item, (tuple, list)):
+                return f"List({[i.__name__ for i in self.item]})"
+            return f"List({self.item.__name__})"
+        except AttributeError:
+            raise InvalidAnnotationJson("Types in List")
+
+    @property
+    def org_type(self):
+        return self._org_type
 
 
 class Dict:
@@ -26,11 +36,18 @@ class Dict:
     def __init__(self, key=All, value=All):
         self.key = key
         self.value = value
-        self.__origin__ = dict
+        self._org_type = dict
         self.__name__ = self.__str__()
 
     def __str__(self):
-        return "Dict({%s:%s})" % (self.key.__name__, self.value.__name__)
+        try:
+            return "Dict({%s:%s})" % (self.key.__name__, self.value.__name__)
+        except AttributeError:
+            raise InvalidAnnotationJson("Types in Dict")
+
+    @property
+    def org_type(self):
+        return self._org_type
 
 
 def type_check(data, annotation):
@@ -52,7 +69,7 @@ def type_check(data, annotation):
                 return False
         return True
 
-    elif isinstance(annotation, tuple):
+    elif isinstance(annotation, (tuple, list)):
         for ann_i in annotation:
             if type_check(data, ann_i):
                 return True

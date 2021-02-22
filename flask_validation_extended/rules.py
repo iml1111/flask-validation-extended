@@ -1,59 +1,185 @@
+import re
+from datetime import datetime
 from abc import ABCMeta, abstractmethod
-
+from .exceptions import InvalidRuleParameter
+from .types import All
 
 class ValidationRule(metaclass=ABCMeta):
 
+    @staticmethod
+    def _param_validate(param, param_type):
+        if not isinstance(param, param_type):
+            InvalidRuleParameter(param, param_type)
+        return param
+
+    @property
+    def types(self):
+        return All
+
     @abstractmethod
-    def valid(self, data):
+    def invalid_str(self):
+        pass
+
+    @abstractmethod
+    def is_valid(self, data) -> bool:
         pass
 
 
 class MinLen(ValidationRule):
 
     def __init__(self, num):
-        if isinstance(num, int):
-            self.num = num
-            self.types = {str, list, dict}
-        else:
-            # TODO: 모든 Rule 인자에 대한 예외처리 진행
-            pass
+        self._num = self._param_validate(num, int)
 
-    def valid(self, data):
-        return len(data) >= self.num
+    @property
+    def types(self):
+        return (str, list, dict)
+
+    def invalid_str(self):
+        return f"must be at least {self._num} elements."
+
+    def is_valid(self, data):
+        return self._num < len(data)
 
 
 class MaxLen(ValidationRule):
 
     def __init__(self, num):
-        self.num = num
-        self.types = {str, list, dict}
+        self._num = self._param_validate(num, int)
 
-    def valid(self, data):
-        return len(data) <= self.num
+    @property
+    def types(self):
+        return (str, list, dict)
+
+    def invalid_str(self):
+        return f"must be a maximum of {self._num} elements."
+
+    def is_valid(self, data) -> bool:
+        return len(data) < self._num
 
 
 class Min(ValidationRule):
 
     def __init__(self, num):
-        self.num = num
-        self.types = {int, float}
+        self._num = self._param_validate(num, int)
 
-    def valid(self, data):
-        return data >= self.num
+    @property
+    def types(self):
+        return (int, float)
+
+    def invalid_str(self):
+        return f"must be larger than {self._num}."
+
+    def is_valid(self, data) -> bool:
+        return self._num < data
 
 
 class Max(ValidationRule):
 
     def __init__(self, num):
-        self.num = num
-        self.types = {int, float}
+        self._num = self._param_validate(num, int)
 
-    def valid(self, data):
-        return data <= self.num
+    @property
+    def types(self):
+        return (int, float)
+
+    def invalid_str(self):
+        return f"must be smaller than {self._num}."
+
+    def is_valid(self, data) -> bool:
+        return data < self._num
 
 
-class StrFilter(ValidationRule):
+class In(ValidationRule):
 
-    def __init__(self, string):
-        self.string = string
-        # TODO: 룰 작성 진행하기
+    def __init__(self, *args):
+        self._enum = args
+
+    def invalid_str(self):
+        return f"must be one of these lists: {self._enum}."
+
+    def is_valid(self, data) -> bool:
+        return data in self._enum
+
+
+class Strip(ValidationRule):
+
+    @property
+    def types(self):
+        return (str,)
+
+    def invalid_str(self):
+        return f"must be a striped string."
+
+    def is_valid(self, data) -> bool:
+        return data == data.strip()
+
+
+class IsoDatetime(ValidationRule):
+
+    @property
+    def types(self):
+        return (str,)
+
+    def invalid_str(self):
+        return f"must be a ISO Datetime Format."
+
+    def is_valid(self, data) -> bool:
+        try:
+            datetime.fromisoformat(data)
+        except ValueError:
+            return False
+        return True
+
+
+class Datetime(ValidationRule):
+
+    def __init__(self, dt_format):
+        self._df_format = self._param_validate(dt_format, str)
+
+    @property
+    def types(self):
+        return (str,)
+
+    def invalid_str(self):
+        return f"must be a Datetime Format: {self._df_format}"
+
+    def is_valid(self, data) -> bool:
+        try:
+            datetime.strptime(data, self._df_format)
+            return True
+        except ValueError:
+            return False
+
+REGEX_EMAIL = (
+    r"^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*"
+    r"@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$"
+)
+
+class Email(ValidationRule):
+
+    @property
+    def types(self):
+        return (str,)
+
+    def invalid_str(self):
+        return f"must be a Email Format."
+
+    def is_valid(self, data) -> bool:
+        return bool(re.fullmatch(pattern=REGEX_EMAIL, string=data))
+
+
+class Regex(ValidationRule):
+
+    def __init__(self, pattern):
+        self._p_str = self._param_validate(pattern, str)
+        self._pattern = re.compile(self._param_validate(self._p_str, str))
+
+    @property
+    def types(self):
+        return (str,)
+
+    def invalid_str(self):
+        return f"pattern does not match: {self._p_str}"
+
+    def is_valid(self, data) -> bool:
+        return bool(self._pattern.search(data))
