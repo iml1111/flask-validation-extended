@@ -2,7 +2,7 @@ from flask import Flask
 from flask_validation_extended import Validator
 from flask_validation_extended.params import  Route, Json, Query, Header
 from flask_validation_extended.types import List, Dict, All
-from flask_validation_extended.rules import MinLen, Min, In, ValidationRule
+from flask_validation_extended.rules import MinLen, Min, In, ValidationRule, Max
 app = Flask(__name__)
 
 
@@ -12,7 +12,7 @@ class CustomRule(ValidationRule):
         return "HI, TEST ERROR!"
 
     def is_valid(self, data) -> bool:
-        return False
+        return True
 
 
 @app.route("/update/<int:id>", methods=["POST"])
@@ -20,11 +20,11 @@ class CustomRule(ValidationRule):
 def hello(
         id = Route(),
         username = Json(int, rules=CustomRule()),
-        age = Json(),
-        nicknames = Json(),
-        password = Json(),
+        age = Json(float, rules=[Min(0), Max(100)]),
+        nicknames = Json(str),
+        password = Json(str),
         is_admin = Query(int, default=1, optional=True),
-        Accept = Header()
+        accept_header = Header('Accept')
      ):
     return locals()
 
