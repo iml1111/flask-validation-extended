@@ -2,7 +2,7 @@ from inspect import signature
 from functools import wraps
 from flask import request
 from .params import Route, Query, Json, Form, File, Header
-from .types import type_check, All
+from .types import type_check, All, FileObj
 
 
 class Validator:
@@ -20,14 +20,16 @@ class Validator:
         @wraps(f)
         def nested_func(**kwargs):
             # 모든 리퀘스트 인자 값 호출
+
             request_inputs = {
                 Header: dict(request.headers.items()),
                 Route: kwargs.copy(),
                 Json: request.json or {},
                 Query: request.args.to_dict(),
                 Form: request.form.to_dict(),
-                File: request.files.to_dict()
+                File: request.files
             }
+
             parsed_inputs = self.validate_parameters(
                 request_inputs, signature(f).parameters
             )
@@ -52,8 +54,12 @@ class Validator:
                 return self.error_func("Invalid parameter type.")
 
             # Header에서 가져올 데이터의 경우, 별도로 입력받은 header_name으로 호출
-            if param_object.__class__ is Header and param_object.header_name:
+            if param_object.__class__ is Header:
                 user_input = request_inputs[Header].get(param_object.header_name)
+            elif param_object.__class__ is File:
+                user_input = request_inputs[File].getlist(param_name)
+                if len(user_input) < 2 and user_input[0].filename == "":
+                    user_input = None
             else:
                 user_input = request_inputs[param_object.__class__].get(param_name)
 
@@ -64,10 +70,16 @@ class Validator:
             # 사용자의 인풋 및 default가 모두 없으며,
             # optional이 아닌 경우, 에러 반환
             elif user_input is None and is_required:
-                return self.error_func(
-                    f"Required {param_object_name} parameter, "
-                    f"'{param_name}' not given."
-                )
+                if param_object.__class__ is Header:
+                    return self.error_func(
+                        f"Required [{param_object_name}] parameter, "
+                        f"Header '{param_object.header_name}' not given."
+                    )
+                else:
+                    return self.error_func(
+                        f"Required [{param_object_name}] parameter, "
+                        f"'{param_name}' not given."
+                    )
 
             # Query, Header, Form, Route의 경우, 타입 변환 시도.
             # 지정된 타입으로의 convert 실패시, 에러 반환
@@ -76,31 +88,21 @@ class Validator:
                 isinstance(user_input, str) and
                 param_annotation not in [str, All]
             ):
-                if param_annotation is int and user_input.isdecimal():
-                    user_input = int(user_input)
-
-                elif (
-                    param_annotation is float and
-                    user_input.replace('.','',1).isdecimal()
-                ):
-                    user_input = float(user_input)
-
-                elif (
-                    param_annotation is bool and
-                    user_input.lower() in ['true', 'false']
-                ):
-                    user_input = user_input.lower() == 'true'
-
-                else:
+                user_input, status = self._convert_parameter(user_input, param_annotation)
+                if not status:
                     return self.error_func(
-                        f"In '{param_object_name}' Params, "
+                        f"In [{param_object_name}] Params, "
                         f"'{param_name}' can't be converted to {param_annotation}."
                     )
 
             # 사용자 입력값이 None이 아니며, type check에 실패한 경우
-            if user_input is not None and not type_check(user_input, param_annotation):
+            if (
+                user_input is not None and
+                param_annotation is not FileObj and
+                not type_check(user_input, param_annotation)
+            ):
                 return self.error_func(
-                    f"In '{param_object_name}' Params, "
+                    f"In [{param_object_name}] Params, "
                     f"'{param_name}' is not {param_annotation}."
                 )
 
@@ -115,4 +117,25 @@ class Validator:
             parsed_inputs[param_name] = user_input
 
         return parsed_inputs
+
+    @staticmethod
+    def _convert_parameter(data, annotation):
+
+        if annotation is int and data.isdecimal():
+            return int(data), True
+
+        elif (
+            annotation is float and
+            data.replace('.', '', 1).isdecimal()
+        ):
+            return float(data), True
+
+        elif (
+            annotation is bool and
+            data.lower() in ['true', 'false']
+        ):
+            return data.lower() == 'true', True
+
+        else:
+            return data, False
 

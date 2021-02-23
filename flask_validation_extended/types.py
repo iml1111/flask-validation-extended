@@ -11,6 +11,10 @@ class All:
     pass
 
 
+class FileObj:
+    pass
+
+
 class List:
 
     def __init__(self, item=All):
@@ -33,15 +37,16 @@ class List:
 
 class Dict:
 
-    def __init__(self, key=All, value=All):
-        self.key = key
-        self.value = value
+    def __init__(self, item=All):
+        self.item = item
         self._org_type = dict
         self.__name__ = self.__str__()
 
     def __str__(self):
         try:
-            return "Dict({%s:%s})" % (self.key.__name__, self.value.__name__)
+            if isinstance(self.item, (tuple, list)):
+                return f"Dict({[i.__name__ for i in self.item]})"
+            return f"Dict({self.item.__name__})"
         except AttributeError:
             raise InvalidAnnotationJson("Types in Dict")
 
@@ -54,10 +59,8 @@ def type_check(data, annotation):
     if isinstance(annotation, Dict):
         if not isinstance(data, dict):
             return False
-        for key, value in data.items():
-            if not isinstance(key, annotation.key):
-                return False
-            if not type_check(value, annotation.value):
+        for value in data.values():
+            if not type_check(value, annotation.item):
                 return False
         return True
 

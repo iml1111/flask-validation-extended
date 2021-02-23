@@ -1,15 +1,16 @@
 import re
 from datetime import datetime
 from abc import ABCMeta, abstractmethod
-from .exceptions import InvalidRuleParameter
-from .types import All
+from .exceptions import InvalidRuleParameter, EmptyTupleException
+from .types import All, FileObj
+
 
 class ValidationRule(metaclass=ABCMeta):
 
     @staticmethod
     def _param_validate(param, param_type):
         if not isinstance(param, param_type):
-            InvalidRuleParameter(param, param_type)
+            raise InvalidRuleParameter(param, param_type)
         return param
 
     @property
@@ -91,8 +92,12 @@ class Max(ValidationRule):
 
 class In(ValidationRule):
 
-    def __init__(self, *args):
-        self._enum = args
+    def __init__(self, enum):
+        self._enum = self._param_validate(enum, (list, tuple))
+
+    @property
+    def types(self):
+        return All
 
     def invalid_str(self):
         return f"must be one of these lists: {self._enum}."
@@ -101,11 +106,24 @@ class In(ValidationRule):
         return data in self._enum
 
 
+class Number(ValidationRule):
+
+    @property
+    def types(self):
+        return str
+
+    def invalid_str(self):
+        return f"must be a digitable(can convert int) string."
+
+    def is_valid(self, data) -> bool:
+        return data.isdecimal()
+
+
 class Strip(ValidationRule):
 
     @property
     def types(self):
-        return (str,)
+        return str
 
     def invalid_str(self):
         return f"must be a striped string."
@@ -118,7 +136,7 @@ class IsoDatetime(ValidationRule):
 
     @property
     def types(self):
-        return (str,)
+        return str
 
     def invalid_str(self):
         return f"must be a ISO Datetime Format."
@@ -138,7 +156,7 @@ class Datetime(ValidationRule):
 
     @property
     def types(self):
-        return (str,)
+        return str
 
     def invalid_str(self):
         return f"must be a Datetime Format: {self._df_format}"
@@ -159,7 +177,7 @@ class Email(ValidationRule):
 
     @property
     def types(self):
-        return (str,)
+        return str
 
     def invalid_str(self):
         return f"must be a Email Format."
@@ -176,10 +194,38 @@ class Regex(ValidationRule):
 
     @property
     def types(self):
-        return (str,)
+        return str
 
     def invalid_str(self):
         return f"pattern does not match: {self._p_str}"
 
     def is_valid(self, data) -> bool:
         return bool(self._pattern.search(data))
+
+
+class Ext(ValidationRule):
+
+    def __init__(self, extensions):
+        if not isinstance(extensions, (list, tuple)):
+            extensions = [extensions]
+        for ext in extensions:
+            self._param_validate(ext, str)
+        self.extensions = extensions
+
+    @property
+    def types(self):
+        return FileObj
+
+    def invalid_str(self):
+        return f'is not matched extension: {self.extensions}'
+
+    def is_valid(self, file_list) -> bool:
+        for file in file_list:
+            check = False
+            for ext in self.extensions:
+                if file.filename.endswith(ext):
+                    check = True
+                    break
+            if not check:
+                return False
+        return True
