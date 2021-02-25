@@ -4,21 +4,50 @@ Types
     - Builtin Types: int, str, float, bool, list, dict
     - Custom Types: List, Dict, All
 """
-from .exceptions import InvalidAnnotationJson
+from .exceptions import InvalidCustomTypeArgument
+
+SINGLE_TYPES = {int, str, float, bool}
+BUILTIN_TYPES = {int, str, float, bool, list, dict}
+# TODO: 커스텀 타입 내부 인자에 대한 검증 구현
 
 
-class All:
+class CustomType:
+
+    @staticmethod
+    def _type_valid(item):
+        try:
+            return (
+                item in BUILTIN_TYPES or
+                item is All or
+                type(item) in {List, Dict}
+            )
+        except TypeError:
+            return False
+
+    def _item_valid(self, item):
+        if isinstance(item, (list, tuple)):
+            for item_i in item:
+                if not self._type_valid(item_i):
+                    return False
+            return True
+        return self._type_valid(item)
+
+
+class All(CustomType):
     pass
 
 
-class FileObj:
+class FileObj(CustomType):
     pass
 
 
-class List:
+class List(CustomType):
 
     def __init__(self, item=All):
-        self.item = item
+        if self._item_valid(item):
+            self.item = item
+        else:
+            raise InvalidCustomTypeArgument("Types in CustomType")
         self._org_type = list
         self.__name__ = self.__str__()
 
@@ -28,31 +57,15 @@ class List:
                 return f"List({[i.__name__ for i in self.item]})"
             return f"List({self.item.__name__})"
         except AttributeError:
-            raise InvalidAnnotationJson("Types in List")
+            raise InvalidCustomTypeArgument("Types in CustomType")
 
     @property
     def org_type(self):
         return self._org_type
 
 
-class Dict:
-
-    def __init__(self, item=All):
-        self.item = item
-        self._org_type = dict
-        self.__name__ = self.__str__()
-
-    def __str__(self):
-        try:
-            if isinstance(self.item, (tuple, list)):
-                return f"Dict({[i.__name__ for i in self.item]})"
-            return f"Dict({self.item.__name__})"
-        except AttributeError:
-            raise InvalidAnnotationJson("Types in Dict")
-
-    @property
-    def org_type(self):
-        return self._org_type
+class Dict(List):
+    pass
 
 
 def type_check(data, annotation):

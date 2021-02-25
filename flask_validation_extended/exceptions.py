@@ -28,6 +28,17 @@ class InvalidAnnotationJson(InvalidAnnotation):
         )
 
 
+class InvalidCustomTypeArgument(InvalidAnnotation):
+
+    def __str__(self):
+        return (
+            '"annotation" is invalid. '
+            f'{self.param} must be one of '
+            f'(int, float, str, bool, list, dict, '
+            f'types.List, types.Dict, types.All) or tuple.'
+        )
+
+
 class InvalidDefault(Exception):
 
     def __str__(self):

@@ -1,4 +1,8 @@
-from .types import All, List, Dict, FileObj, type_check
+from .types import (
+    All, List, Dict, FileObj, type_check,
+    SINGLE_TYPES, BUILTIN_TYPES
+)
+
 from .rules import ValidationRule
 from .exceptions import (
     InvalidOptional, InvalidDefault,
@@ -7,9 +11,6 @@ from .exceptions import (
     InvalidHeaderName
 )
 
-
-SINGLE_TYPES = {int, str, float, bool}
-BUILTIN_TYPES = {int, str, float, bool, list, dict}
 CUSTOM_TYPES = {List, Dict, FileObj}
 
 
@@ -23,7 +24,7 @@ class Parameter:
             optional=False
     ):
         self.annotation = self._annotation_valid(annotation)
-        self.default = self._default_valid(default, annotation)
+        self.default = self._default_valid(default, self.annotation)
         self.rules = self._rules_valid(rules)
         self.optional = self._optional_valid(optional)
 
