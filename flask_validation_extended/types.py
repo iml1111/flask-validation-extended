@@ -8,7 +8,6 @@ from .exceptions import InvalidCustomTypeArgument
 
 SINGLE_TYPES = {int, str, float, bool}
 BUILTIN_TYPES = {int, str, float, bool, list, dict}
-# TODO: 커스텀 타입 내부 인자에 대한 검증 구현
 
 
 class CustomType:

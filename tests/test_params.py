@@ -5,7 +5,7 @@ from flask_validation_extended.exceptions import (
     InvalidOptional
 )
 from flask_validation_extended.types import All, List, Dict, FileObj
-from flask_validation_extended.params import Route, Query, Form, Header
+from flask_validation_extended.params import Route, Query, Form
 
 
 class ParamTestCase(unittest.TestCase):
