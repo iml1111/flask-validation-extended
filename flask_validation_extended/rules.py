@@ -169,8 +169,7 @@ class Datetime(ValidationRule):
             return False
 
 REGEX_EMAIL = (
-    r"^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*"
-    r"@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$"
+    r"^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
 )
 
 class Email(ValidationRule):
