@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 from abc import ABCMeta, abstractmethod
-from .exceptions import InvalidRuleParameter, EmptyTupleException
+from .exceptions import InvalidRuleParameter
 from .types import All, FileObj
 
 
@@ -169,7 +169,9 @@ class Datetime(ValidationRule):
             return False
 
 REGEX_EMAIL = (
-    r"^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
+    r"^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@"
+    r"[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?"
+    r"(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
 )
 
 class Email(ValidationRule):
@@ -183,6 +185,20 @@ class Email(ValidationRule):
 
     def is_valid(self, data) -> bool:
         return bool(re.fullmatch(pattern=REGEX_EMAIL, string=data))
+
+REGEX_PHONE_NUM = r"^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3,4}[\s.-]\d{4}$"
+
+class PhoneNum(ValidationRule):
+
+    @property
+    def types(self):
+        return str
+
+    def invalid_str(self):
+        return f"must be a PhoneNumber Format."
+
+    def is_valid(self, data) -> bool:
+        return bool(re.fullmatch(pattern=REGEX_PHONE_NUM, string=data))
 
 
 class Regex(ValidationRule):
@@ -228,3 +244,35 @@ class Ext(ValidationRule):
             if not check:
                 return False
         return True
+
+
+class MaxFileCount(ValidationRule):
+
+    def __init__(self, max_num):
+        self.max_num = self._param_validate(max_num, int)
+
+    @property
+    def types(self):
+        return FileObj
+
+    def invalid_str(self):
+        return f'File Count must smaller than {self.max_num}.'
+
+    def is_valid(self, file_list) -> bool:
+        return len(file_list) < self.max_num
+
+
+class MinFileCount(ValidationRule):
+
+    def __init__(self, min_num):
+        self.min_num = self._param_validate(min_num, int)
+
+    @property
+    def types(self):
+        return FileObj
+
+    def invalid_str(self):
+        return f'File Count must smaller than {self.min_num}.'
+
+    def is_valid(self, file_list) -> bool:
+        return len(file_list) > self.min_num

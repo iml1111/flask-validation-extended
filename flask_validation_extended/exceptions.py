@@ -24,7 +24,7 @@ class InvalidAnnotationJson(InvalidAnnotation):
             '"annotation" is invalid. '
             f'{self.param} must be one of '
             f'(int, float, str, bool, list, dict, '
-            f'types.List, types.Dict, types.All) or tuple.'
+            f'types.List(), types.Dict(), types.All) or tuple.'
         )
 
 
@@ -35,7 +35,7 @@ class InvalidCustomTypeArgument(InvalidAnnotation):
             '"annotation" is invalid. '
             f'{self.param} must be one of '
             f'(int, float, str, bool, list, dict, '
-            f'types.List, types.Dict, types.All) or tuple.'
+            f'types.List(), types.Dict(), types.All) or tuple.'
         )
 
 

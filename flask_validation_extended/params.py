@@ -23,49 +23,58 @@ class Parameter:
             rules=None,
             optional=False
     ):
+        if not isinstance(annotation, (list, tuple)):
+            annotation = [annotation]
         self.annotation = self._annotation_valid(annotation)
-        self.default = self._default_valid(default, self.annotation)
-        self.rules = self._rules_valid(rules)
-        self.optional = self._optional_valid(optional)
 
-    def _annotation_valid(self, annotation):
-        if annotation in SINGLE_TYPES or annotation is All:
-            return annotation
-        elif isinstance(annotation, (tuple, list)):
-            for ann_i in annotation:
-                self._annotation_valid(ann_i)
-            return annotation
-        raise InvalidAnnotation(self.__class__.__name__)
-
-    @staticmethod
-    def _default_valid(default, annotation):
-        if default is None or type_check(default, annotation):
-            return default
-        raise InvalidDefault()
-
-    def _rules_valid(self, rules):
+        self.default = self._default_valid(default)
 
         rules = [] if rules is None else rules
         if not isinstance(rules, (tuple, list)):
             rules = [rules]
+        self.rules = self._rules_valid(rules)
 
-        origin_ann = self.annotation
-        if hasattr(self.annotation, 'org_type'):
-            origin_ann = self.annotation.org_type
+        self.optional = self._optional_valid(optional)
 
-        for rule in rules:
-            if rule.__class__.__bases__[0] is not ValidationRule:
-                raise InvalidRule(rule.__class__.__bases__[0])
-            if isinstance(rule.types, (list, tuple)):
-                if All not in rule.types and origin_ann not in rule.types:
-                    raise InvalidRuleAnnotation(
-                        rule.__class__.__name__, rule.types
-                    )
-            else:
-                if rule.types is not All and  origin_ann is not rule.types:
-                    raise InvalidRuleAnnotation(
-                        rule.__class__.__name__, rule.types
-                    )
+    def _annotation_valid(self, annotations):
+        for annotation in annotations:
+            if annotation not in SINGLE_TYPES and annotation is not All:
+                raise InvalidAnnotation(self.__class__.__name__)
+        return annotations
+
+    def _default_valid(self, default):
+        if default is None:
+            return default
+        for annotation in self.annotation:
+            if type_check(default, annotation):
+                return default
+        raise InvalidDefault()
+
+    def _rules_valid(self, rules):
+
+        if isinstance(self.annotation, tuple):
+            origin_anns = list(self.annotation)
+        else:
+            origin_anns = self.annotation[:]
+
+        for idx, origin_ann in enumerate(origin_anns):
+            if hasattr(origin_ann, 'org_type'):
+                origin_anns[idx] = origin_ann.org_type
+
+        for origin_ann in origin_anns:
+            for rule in rules:
+                if rule.__class__.__bases__[0] is not ValidationRule:
+                    raise InvalidRule(rule.__class__.__bases__[0])
+                if isinstance(rule.types, (list, tuple)):
+                    if All not in rule.types and origin_ann not in rule.types:
+                        raise InvalidRuleAnnotation(
+                            rule.__class__.__name__, rule.types
+                        )
+                else:
+                    if rule.types is not All and  origin_ann is not rule.types:
+                        raise InvalidRuleAnnotation(
+                            rule.__class__.__name__, rule.types
+                        )
 
         return rules
 
@@ -98,34 +107,26 @@ class Header(Parameter):
 
 class Json(Parameter):
 
-    def _annotation_valid(self, annotation):
-        if (
-            annotation in BUILTIN_TYPES or
-            type(annotation) in CUSTOM_TYPES or
-            annotation is All
-        ):
-            return annotation
-        elif isinstance(annotation, (tuple, list)):
-            for ann_i in annotation:
-                self._annotation_valid(ann_i)
-            return annotation
-        raise InvalidAnnotationJson(self.__class__.__name__)
-
+    def _annotation_valid(self, annotations):
+        for annotation in annotations:
+            if (
+                annotation not in BUILTIN_TYPES and
+                type(annotation) not in CUSTOM_TYPES and
+                annotation is not All
+            ):
+                raise InvalidAnnotationJson(self.__class__.__name__)
+        return annotations
 
 class File(Parameter):
 
     def __init__(self, rules=None, optional=False):
         super().__init__(rules=rules, optional=optional)
-        self.annotation = FileObj
+        self.annotation = [FileObj]
 
     def _annotation_valid(self, annotation):
         return annotation
 
     def _rules_valid(self, rules):
-
-        rules = [] if rules is None else rules
-        if not isinstance(rules, (tuple, list)):
-            rules = [rules]
 
         for rule in rules:
             if rule.__class__.__bases__[0] is not ValidationRule:

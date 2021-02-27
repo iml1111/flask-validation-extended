@@ -64,7 +64,14 @@ class List(CustomType):
 
 
 class Dict(List):
-    pass
+
+    def __str__(self):
+        try:
+            if isinstance(self.item, (tuple, list)):
+                return f"Dict({[i.__name__ for i in self.item]})"
+            return f"Dict({self.item.__name__})"
+        except AttributeError:
+            raise InvalidCustomTypeArgument("Types in CustomType")
 
 
 def type_check(data, annotation):

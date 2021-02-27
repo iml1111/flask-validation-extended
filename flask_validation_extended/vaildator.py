@@ -58,7 +58,9 @@ class Validator:
                 user_input = request_inputs[Header].get(param_object.header_name)
             elif param_object.__class__ is File:
                 user_input = request_inputs[File].getlist(param_name)
-                if len(user_input) < 2 and user_input[0].filename == "":
+                if not user_input:
+                    user_input = None
+                elif len(user_input) == 1 and user_input[0].filename == "":
                     user_input = None
             else:
                 user_input = request_inputs[param_object.__class__].get(param_name)
@@ -86,24 +88,24 @@ class Validator:
             if (
                 param_object.__class__ in {Header, Query, Form, Route} and
                 isinstance(user_input, str) and
-                param_annotation not in [str, All]
+                param_annotation[0] not in [str, All]
             ):
-                user_input, status = self._convert_parameter(user_input, param_annotation)
+                user_input, status = self._convert_parameter(user_input, param_annotation[0])
                 if not status:
                     return self.error_func(
                         f"In [{param_object_name}] Params, "
-                        f"'{param_name}' can't be converted to {param_annotation}."
+                        f"'{param_name}' can't be converted to {param_annotation[0]}."
                     )
 
             # 사용자 입력값이 None이 아니며, type check에 실패한 경우
             if (
                 user_input is not None and
-                param_annotation is not FileObj and
+                param_annotation[0] is not FileObj and
                 not type_check(user_input, param_annotation)
             ):
                 return self.error_func(
                     f"In [{param_object_name}] Params, "
-                    f"'{param_name}' is not {param_annotation}."
+                    f"'{param_name}' is not {[str(i) for i in param_annotation]}."
                 )
 
             # 사용자 입력값이 None이 아니면, 입력된 Rule에 대하여 validation 개시
