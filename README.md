@@ -88,17 +88,20 @@ parameter_name = Param(parameter_type, default, rules, optional)
 
 ## Documentation
 
-- **Param** 
+- [**Param**](https://github.com/iml1111/flask-validation-extended/blob/main/docs/param.md) 
 
   인풋 파라미터 수집시, 어떤 영역에 대한 수집을 지원하는지 확인하려면 여기를 클릭하세요.
 
-- **Parameter Type**
+- [**Parameter Type**](https://github.com/iml1111/flask-validation-extended/blob/main/docs/parameter_type.md)
+  
   파라미터 타입 검증시, 어떤 타입의 형태를 지원하는지 확인하려면 여기를 클릭하세요.
 
-- **Rules**
+- [**Rules**](https://github.com/iml1111/flask-validation-extended/blob/main/docs/rules.md)
+  
   파라미터 검증시, 기본적으로 어떠한 Rule을 지원하는지, 또한 커스텀 룰을 등록하는 방법 등을 확인하려면 여기를 클릭하세요.
 
-- **Custom Error Function**
+- [**Custom Error Function**](https://github.com/iml1111/flask-validation-extended/blob/main/docs/custom_error_function.md)
+  
   검증 실패시, 커스텀 에러 함수를 정의하려면 여기를 클릭하세요.
 
 
