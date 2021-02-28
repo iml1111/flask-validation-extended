@@ -17,9 +17,8 @@ class ValidationRule(metaclass=ABCMeta):
     def types(self):
         return All
 
-    @abstractmethod
     def invalid_str(self):
-        pass
+        return f"doesn't not match the {self.__class__.__name__} rule"
 
     @abstractmethod
     def is_valid(self, data) -> bool:
@@ -61,7 +60,7 @@ class MaxLen(ValidationRule):
 class Min(ValidationRule):
 
     def __init__(self, num):
-        self._num = self._param_validate(num, int)
+        self._num = self._param_validate(num, (int, float))
 
     @property
     def types(self):
@@ -77,7 +76,7 @@ class Min(ValidationRule):
 class Max(ValidationRule):
 
     def __init__(self, num):
-        self._num = self._param_validate(num, int)
+        self._num = self._param_validate(num, (int, float))
 
     @property
     def types(self):
