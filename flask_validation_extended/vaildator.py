@@ -123,14 +123,17 @@ class Validator:
     @staticmethod
     def _convert_parameter(data, annotation):
 
-        if annotation is int and data.isdecimal():
-            return int(data), True
+        if annotation is int:
+            try:
+                return int(data), True
+            except ValueError:
+                return data, False
 
-        elif (
-            annotation is float and
-            data.replace('.', '', 1).isdecimal()
-        ):
-            return float(data), True
+        elif annotation is float:
+            try:
+                return float(data), True
+            except ValueError:
+                return data, False
 
         elif (
             annotation is bool and
@@ -138,6 +141,5 @@ class Validator:
         ):
             return data.lower() == 'true', True
 
-        else:
-            return data, False
+        return data, False
 
