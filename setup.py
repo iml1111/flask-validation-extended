@@ -11,7 +11,7 @@ with open("README.md", "r", encoding='utf-8') as f:
 
 setup(
     name='flask-validation-extended',
-    version='0.1.1',
+    version='0.1.2',
     description='Get and validate all Flask input parameters with easily!',
     long_description=long_description,
     long_description_content_type='text/markdown',
