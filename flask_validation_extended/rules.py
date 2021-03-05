@@ -38,7 +38,7 @@ class MinLen(ValidationRule):
         return f"must be at least {self._num} elements."
 
     def is_valid(self, data):
-        return self._num < len(data)
+        return self._num <= len(data)
 
 
 class MaxLen(ValidationRule):
@@ -54,7 +54,7 @@ class MaxLen(ValidationRule):
         return f"must be a maximum of {self._num} elements."
 
     def is_valid(self, data) -> bool:
-        return len(data) < self._num
+        return len(data) <= self._num
 
 
 class Min(ValidationRule):
@@ -70,7 +70,7 @@ class Min(ValidationRule):
         return f"must be larger than {self._num}."
 
     def is_valid(self, data) -> bool:
-        return self._num < data
+        return self._num <= data
 
 
 class Max(ValidationRule):
@@ -86,7 +86,7 @@ class Max(ValidationRule):
         return f"must be smaller than {self._num}."
 
     def is_valid(self, data) -> bool:
-        return data < self._num
+        return data <= self._num
 
 
 class In(ValidationRule):

@@ -25,8 +25,8 @@ class Validator:
                 Header: dict(request.headers.items()),
                 Route: kwargs.copy(),
                 Json: request.json or {},
-                Query: request.args.to_dict(),
-                Form: request.form.to_dict(),
+                Query: request.args,
+                Form: request.form,
                 File: request.files
             }
 

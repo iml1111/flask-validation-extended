@@ -5,13 +5,14 @@ Get and validate all Flask input parameters with easily!
 """
 
 from setuptools import setup
+from flask_validation_extended import __VERSION__
 
 with open("README.md", "r", encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
     name='flask-validation-extended',
-    version='0.1.2',
+    version=__VERSION__,
     description='Get and validate all Flask input parameters with easily!',
     long_description=long_description,
     long_description_content_type='text/markdown',
