@@ -1,4 +1,4 @@
-# Flask-Validate-Extended  ![Python versions](https://img.shields.io/badge/Python-3.6<=@-blue) ![License](https://img.shields.io/badge/license-MIT-green) ![Release](https://img.shields.io/badge/release-not_yet-red)
+# Flask-Validate-Extended  ![Python versions](https://img.shields.io/badge/Python-3.6<=@-blue) ![License](https://img.shields.io/badge/license-MIT-green) ![Release](https://img.shields.io/badge/release-0.1.4-red)
 
 플라스크로 들어오는 모든 파라미터를 쉽게 검증하세요!
 
