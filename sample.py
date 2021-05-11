@@ -21,9 +21,9 @@ class CustomRule(ValidationRule):
 
 def custom_error(error_message):
     return {
-               "info": "In hello API",
-               "error": error_message
-           }, 400
+        "info": "In hello API",
+        "error": error_message
+    }, 400
 
 
 @app.route("/update/<int:id>", methods=["POST"])

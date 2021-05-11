@@ -258,7 +258,7 @@ class MaxFileCount(ValidationRule):
         return f'File Count must smaller than {self.max_num}.'
 
     def is_valid(self, file_list) -> bool:
-        return len(file_list) < self.max_num
+        return len(file_list) <= self.max_num
 
 
 class MinFileCount(ValidationRule):
@@ -274,4 +274,4 @@ class MinFileCount(ValidationRule):
         return f'File Count must smaller than {self.min_num}.'
 
     def is_valid(self, file_list) -> bool:
-        return len(file_list) > self.min_num
+        return len(file_list) >= self.min_num
