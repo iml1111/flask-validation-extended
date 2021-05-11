@@ -1,4 +1,4 @@
-# Flask-Validate-Extended  ![Python versions](https://img.shields.io/badge/Python-3.6<=@-blue) ![License](https://img.shields.io/badge/license-MIT-green) ![Release](https://img.shields.io/badge/release-0.1.5-red)
+# Flask-Validation-Extended  ![Python versions](https://img.shields.io/badge/Python-3.6<=@-blue) ![License](https://img.shields.io/badge/license-MIT-green) ![Release](https://img.shields.io/badge/release-0.1.5-red)
 
 플라스크로 들어오는 모든 파라미터를 쉽게 검증하세요!
 
@@ -8,7 +8,7 @@ Header, Route, Query, Form, Json, File 등 입력될 수 있는 모든 파라미
 
 ## Install
 
-**Pip**: `pip install flask_validation_extended` (아직 준비중 입니다!)
+**Pip**: `pip install flask-validation-extended`
 
 **Direct:**
 
