@@ -19,8 +19,11 @@ from .rules import (
     IsoDatetime,
     Datetime,
     Email,
+    PhoneNum,
     Regex,
     Ext,
+    MaxFileCount,
+    MinFileCount
 )
 from .types import (
     All,
@@ -28,6 +31,8 @@ from .types import (
     List,
     Dict
 )
+
+from .exceptions import *
 
 
 __AUTHOR__ = "IML"
