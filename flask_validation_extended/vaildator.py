@@ -1,6 +1,6 @@
 from inspect import signature
 from functools import wraps
-from flask import request
+from flask import request, g
 from .params import Route, Query, Json, Form, File, Header
 from .types import type_check, All, FileObj
 
@@ -19,7 +19,9 @@ class Validator:
     def __call__(self, f):
         @wraps(f)
         def nested_func(**kwargs):
-            # 모든 리퀘스트 인자 값 호출
+            
+            if g.get('deactivate_validator'):
+                return f(**kwargs)
 
             request_inputs = {
                 Header: dict(request.headers.items()),
