@@ -37,7 +37,7 @@ from .exceptions import *
 
 
 __AUTHOR__ = "IML"
-__VERSION__ = "0.1.6"
+__VERSION__ = "0.1.7"
 
 # TODO: 변수 및 메소드 Private 처리하기
 # TODO: 커스텀 타입간의 비교 로직 구현 (커스텀룰 어노테이션 검증을 위함)
