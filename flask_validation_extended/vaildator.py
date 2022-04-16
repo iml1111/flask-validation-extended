@@ -26,7 +26,7 @@ class Validator:
             request_inputs = {
                 Header: dict(request.headers.items()),
                 Route: kwargs.copy(),
-                Json: request.json or {},
+                Json: request.get_json(silent=True) or {},
                 Query: request.args,
                 Form: request.form,
                 File: request.files
