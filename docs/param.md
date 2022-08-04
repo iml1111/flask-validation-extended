@@ -10,7 +10,7 @@ Flask-Validation-Extended supports the following input parameters:
 - **Header:** Input parameters entered in the header in the request.
 - **File:** This is an input parameter entered as a File type in the Form.
 
-
+<br>
 
 ## Manually Usage
 
@@ -40,7 +40,7 @@ In case of **File**, annotation and default cannot be input. So, how to use it i
 parameter_name = File(rules, optional)
 ```
 
-
+<br>
 
 ## annotation (aka parameter_type)
 
@@ -58,7 +58,7 @@ Json(list) # The input must be a list.
 Json(dict) # The input must be a dict (like json).
 ```
 
-
+<br>
 
 ### Multiple Types
 
@@ -70,7 +70,7 @@ Multiple parameters can be grouped in the form of a list and passed as an argume
 Param([int, str, bool]) # It doesn't matter which one of int, str, or bool comes.
 ```
 
-
+<br>
 
 ### Types by parameter
 
@@ -81,7 +81,7 @@ The types that can be specified are limited according to each Param.
 - **Json** supports `int, float, str, bool, list, dict`. Furthermore, for complex data types (`list`, `dict`) including multiple data types, type verification for each internal value is possible.
 - **File** is a special type of data that only accepts `FileObj`. This cannot be modified at the user level.
 
-
+<br>
 
 ### Input Convert
 
@@ -94,7 +94,7 @@ In the case of **flask_validation_extended**, if the corresponding input is `str
 
 **(Caution) However, if multiple annotations are entered in the form of a list, ** **Performs data type conversion based on the first annotation among them.**
 
-
+<br>
 
 ### Complex data type (and Custom Type)
 
@@ -110,7 +110,7 @@ If you want to go one step further and additionally verify detailed data within 
 
 For more detailed description of annotations, please refer to the **parameter type documentation**.
 
-
+<br>
 
 ## default 
 
@@ -120,7 +120,7 @@ If no input is entered in the corresponding Param, it is the default value that 
 
 **When entering the default value, it must match the specification of the annotation passed along with it.**
 
-
+<br>
 
 ## rules
 
@@ -161,7 +161,7 @@ There are various rules created by default.
 
  Also, for rules, you can directly **implement custom rules**. Please refer to **Rule Documentation** for more information.
 
-
+<br>
 
 ## optional
 
