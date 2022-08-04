@@ -1,6 +1,6 @@
 # Custom Error Function Documentation
 
-flask_validation_extended는 Validate 과정에 실패할 경우, 아래와 같은 포맷의 형태로 클라이언트에게 에러를 리턴합니다.
+`flask_validation_extended` returns an error to the client in the format below when the validation process fails.
 
 ```python
 @staticmethod
@@ -8,13 +8,13 @@ flask_validation_extended는 Validate 과정에 실패할 경우, 아래와 같�
         return {"error": error_message}, 400
 ```
 
-**error_message**의 경우, validation 중, 각 세부 과정에 대하여 어느 지점에 실패했는지에 대한 정보가 문자열로 전달됩니다. 
+In the case of **error_message**, information about which point failed for each detailed process during validation is delivered as a string.
 
 
 
-이를 Custom Error function을 구현하여 오버라이딩할 수 있습니다.
+This can be overridden by implementing a Custom Error function. 
 
-커스텀 에러 함수은 위의 error_message를 인자로 받을 수 있는 형태로 아래와 같이 구현합니다.
+The custom error function is implemented as follows in a form that can receive the above error_message as an argument.
 
 ```python
 def custom_error(error_message):
@@ -24,11 +24,11 @@ def custom_error(error_message):
            }, 400
 ```
 
-그 후, Validator 데코레이터 등록시, 해당 클래스의 인자로 함께 등록하면 됩니다.
+After that, when registering the Validator decorator, register it as an argument of the corresponding class.
 
 ```python
 @app.route("/update/<int:id>", methods=["POST"])
-@Validator(custom_error) # 커스텀 에러 함수 등록
+@Validator(custom_error) # Register custom error function
 def hello(
 ...
     
