@@ -48,7 +48,7 @@ def some_api(
 ):
     ...
     if dry is True:
-        invalidate()
+        invalidate() # Invalidate validation
         return dry_api( # Another Route function call
             type=type, size=size,
             filename=path.replace(target, ""),
