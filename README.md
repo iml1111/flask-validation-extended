@@ -101,8 +101,10 @@ Please refer to the Documentation below for details.
 - [**Custom Error Function**](https://github.com/iml1111/flask-validation-extended/blob/main/docs/custom_error_function.md)
   
   If validation fails, click here to define a custom error function.
+  
+- [**Advanced Usage**](https://github.com/iml1111/flask-validation-extended/blob/main/docs/advanced_usage.md)
 
-
+​		Click here for more advanced features.
 
 # References
 
