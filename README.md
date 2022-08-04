@@ -1,10 +1,8 @@
-# Flask-Validation-Extended  ![Python versions](https://img.shields.io/badge/Python-3.6<=@-blue) ![License](https://img.shields.io/badge/license-MIT-green) ![Release](https://img.shields.io/badge/release-0.1.6-red)
+# Flask-Validation-Extended  ![Python versions](https://img.shields.io/pypi/pyversions/flask-validation-extended) ![License](https://img.shields.io/badge/license-MIT-green) ![Release](https://img.shields.io/pypi/v/flask-validation-extended)
 
-플라스크로 들어오는 모든 파라미터를 쉽게 검증하세요!
+Easily validate all parameters coming into your flask!
 
-Header, Route, Query, Form, Json, File 등 입력될 수 있는 모든 파라미터에 대하여 validation 기능을 제공합니다.
-
-
+ Provides validation function for all parameters that can be input such as `Header`, `Route`, `Query`, `Form`, `Json`, and `File`.
 
 ## Install
 
@@ -29,13 +27,13 @@ from flask_validation_extended.rules import MinLen, Min, Max, IsoDatetime
 app = Flask(__name__)
 
 """
-id: URI 파라미터에 수집하며, int여야 한다.
-username: Body-Json에서 수집하며, str이여야 하고, 최소 길이가 5보다 커야 한다.
-age: Body-Json에서 수집하며, int여야 하고, 16 ~ 98 사이여야 한다
-nicknames: Body-Json에서 수집하며, str으로 구성된 list여야 한다.
-birthday: Body-Json에서 수집하며, str이여야 하고, ISO Datetime format이여야 한다.
-expire: Body-Json에서 수집하며, int여야 하지만, 반드시 입력받지 않아도 된다.(Optional)
-is_admin: Query에서 수집하며, bool이여야 하며, 입력되지 않을 경우, false로 취급한다.
+id: Collected in the URI parameter, and must be int.
+username: Collected from Body-Json, must be str, and minimum length greater than 5.
+age: Collected from Body-Json, it must be an int, and must be between 16 and 98.
+nicknames: Collected by Body-Json, it should be a list consisting of str.
+birthday: Collected from Body-Json, must be str, and must be in ISO Datetime format.
+expire: Collected from Body-Json, and it must be int, but it does not have to be input. (Optional)
+is_admin: Collected from Query and must be bool. If it is not input, it is treated as false.
 """
 @app.route("/update/<int:id>", methods=["POST"])
 @Validator()
@@ -59,30 +57,30 @@ if __name__ == "__main__":
 
 ## Simple Usage
 
-1. 적용하고자 하는 flask route 함수에 대하여 Validator() 데코레이터를 등록합니다.
-2. 각 argument에 대하여 어느 영역에서 해당 값을 조회하고 검증할 것인지를 Param 객체를 선언하여 등록합니다. 
+1. Register the Validator() decorator for the flask route function you want to apply.
+2.  For each argument, declare and register the Param object in which area to search and verify the value.
 
 ```python
 parameter_name = Param(parameter_type, default, rules, optional)
-# parameter_name : 해당 파라미터의 이름
-# Param: 어느 영역에서 파라미터를 조회할 것인가 (헤더, 라우트(URI), 쿼리, 폼, Json, 파일)
-# parameter_type: 해당 파라미터의 타입 (단일 or 복수 리스트)
-# default: 값이 오지 않을 경우의 기본 값 설정
-# rules: 해당 파라미터에 대한 검증 로직 (단일 or 복수 리스트)
-# optional: 해당 파라미터 필수 여부 설정 (True or False)
+# parameter_name : the name of the parameter
+# Param: In which area to search for parameters (Header, Route(URI), Query, Form, Json, File)
+# parameter_type: the type of the parameter (single or multiple list)
+# default: Set default value when no value is provided
+# rules: Additional validation logic for that parameter (single or multiple list)
+# optional: Set whether the corresponding parameter is required (True or False)
 
 '''
-해당 usage는 어떤 Param을 사용하느냐에 따라 조금씩 다를 수 있습니다.
-자세한 사항은 아래의 Documentation을 참고해주세요.
+The usage may be slightly different depending on which Param is used.
+Please refer to the Documentation below for details.
 '''
 ```
 
-3. 각각의 파라미터에 대하여 다음과 같은 과정을 수행합니다.
-   - 지정된 영역에서 해당 이름의 파라미터가 존재하는지 확인.
-   - 해당 파라미터가 존재하지 않을 경우, default 값 및 optional 여부를 확인.
-   - 해당 파라미터가 지정된 파라미터 타입과 일치하는지 검증.
-   - 입력된 룰에 대하여 해당 파라미터가 모두 충족하는지 확인.
-   - 해당 파라미터를 route 함수 시작시의 argument로 반환.
+3. For each parameter, proceed as follows.
+   - Check if a parameter with that name exists in the specified area.
+   -  If the parameter does not exist, check the default value and optional.
+   - Verifies that the corresponding parameter matches the specified parameter type.
+   -  Check whether all relevant parameters for the entered rule are satisfied.
+   - The corresponding parameter is returned as an argument at the start of the route function.
 
 
 
@@ -90,21 +88,23 @@ parameter_name = Param(parameter_type, default, rules, optional)
 
 - [**Param**](https://github.com/iml1111/flask-validation-extended/blob/main/docs/param.md) 
 
-  인풋 파라미터 수집시, 어떤 영역에 대한 수집을 지원하는지 확인하려면 여기를 클릭하세요.
+  When collecting input parameters, click here to see which areas support collection.
 
 - [**Parameter Type**](https://github.com/iml1111/flask-validation-extended/blob/main/docs/parameter_type.md)
   
-  파라미터 타입 검증시, 어떤 타입의 형태를 지원하는지 확인하려면 여기를 클릭하세요.
+   Click here to check which types are supported when validating parameter types.
 
 - [**Rules**](https://github.com/iml1111/flask-validation-extended/blob/main/docs/rules.md)
   
-  파라미터 검증시, 기본적으로 어떠한 Rule을 지원하는지, 또한 커스텀 룰을 등록하는 방법 등을 확인하려면 여기를 클릭하세요.
+  When verifying parameters, click here to check which rules are supported by default and how to register custom rules.
 
 - [**Custom Error Function**](https://github.com/iml1111/flask-validation-extended/blob/main/docs/custom_error_function.md)
   
-  검증 실패시, 커스텀 에러 함수를 정의하려면 여기를 클릭하세요.
+  If validation fails, click here to define a custom error function.
+  
+- [**Advanced Usage**](https://github.com/iml1111/flask-validation-extended/blob/main/docs/advanced_usage.md)
 
-
+​		Click here for more advanced features.
 
 # References
 
