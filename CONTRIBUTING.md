@@ -1,4 +1,4 @@
-# Contributing to sejong-univ-auth
+# Contributing to flask-validation-extended
 
 🎈 First off, thanks for taking the time to contribute! 🎈
 
